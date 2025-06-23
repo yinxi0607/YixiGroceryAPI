@@ -12,7 +12,7 @@ func Auth() gin.HandlerFunc {
 			return
 		}
 
-		tokenStr := c.GetHeader("content")
+		tokenStr := c.GetHeader("Authorization")
 		if tokenStr == "" {
 			c.JSON(401, gin.H{"code": 401, "message": "Missing token"})
 			c.Abort()

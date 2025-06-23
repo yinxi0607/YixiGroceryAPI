@@ -2,11 +2,12 @@ package config
 
 import (
 	"context"
-	"github.com/go-redis/redis/v8"
+	"log"
+
+	"github.com/redis/go-redis/v9"
 	"github.com/yinxi0607/YixiGroceryAPI/user-service/model"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
-	"log"
 )
 
 var DB *gorm.DB

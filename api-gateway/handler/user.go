@@ -2,10 +2,11 @@ package handler
 
 import (
 	"context"
-	"github.com/gin-gonic/gin"
-	userProto "github.com/yinxi0607/YixiGroceryAPI/proto/user"
-	"google.golang.org/grpc"
 	"strconv"
+
+	"github.com/gin-gonic/gin"
+	userProto "github.com/yinxi0607/YixiGroceryAPI/user-service/proto/user"
+	"google.golang.org/grpc"
 )
 
 type UserHandler struct {

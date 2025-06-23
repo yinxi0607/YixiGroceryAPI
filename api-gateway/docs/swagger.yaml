@@ -1,0 +1,12 @@
+info:
+  contact: {}
+  description: API for Yixi Grocery microservices
+  title: YixiGroceryAPI
+  version: "1.0"
+paths: {}
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

@@ -2,12 +2,14 @@ package handler
 
 import (
 	"context"
+	"time"
+
 	"github.com/dgrijalva/jwt-go"
 	userProto "github.com/yinxi0607/YixiGroceryAPI/proto/user"
 	"github.com/yinxi0607/YixiGroceryAPI/user-service/config"
 	"github.com/yinxi0607/YixiGroceryAPI/user-service/model"
 	"github.com/yinxi0607/YixiGroceryAPI/user-service/utils"
-	"time"
+	"gorm.io/gorm"
 )
 
 type UserHandler struct{}
