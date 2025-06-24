@@ -1,4 +1,4 @@
-protoc:
+protoc-user:
 	protoc \
 	  --proto_path=. \
 	  --proto_path=./google/api \

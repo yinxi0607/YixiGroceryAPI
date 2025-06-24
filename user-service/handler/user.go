@@ -2,14 +2,13 @@ package handler
 
 import (
 	"context"
+	userProto "github.com/yinxi0607/YixiGroceryAPI/proto/user"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
-	userProto "github.com/yinxi0607/YixiGroceryAPI/proto/user"
 	"github.com/yinxi0607/YixiGroceryAPI/user-service/config"
 	"github.com/yinxi0607/YixiGroceryAPI/user-service/model"
 	"github.com/yinxi0607/YixiGroceryAPI/user-service/utils"
-	"gorm.io/gorm"
 )
 
 type UserHandler struct{}
@@ -35,7 +34,7 @@ func (h *UserHandler) Register(ctx context.Context, req *userProto.RegisterReque
 
 	resp.Code = 0
 	resp.Message = "Success"
-	resp.Data = &userProto.User{
+	resp.Data = &user.User{
 		Id:       uint32(user.ID),
 		Username: user.Username,
 		Phone:    user.Phone,
@@ -86,7 +85,7 @@ func (h *UserHandler) GetUserInfo(ctx context.Context, req *userProto.GetUserInf
 
 	resp.Code = 0
 	resp.Message = "Success"
-	resp.Data = &userProto.User{
+	resp.Data = &user.User{
 		Id:       uint32(user.ID),
 		Username: user.Username,
 		Phone:    user.Phone,
