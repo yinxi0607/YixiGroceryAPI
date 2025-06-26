@@ -5,7 +5,7 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
-	userProto "github.com/yinxi0607/YixiGroceryAPI/user-service/proto/user"
+	userProto "github.com/yinxi0607/YixiGroceryAPI/proto/user"
 	"google.golang.org/grpc"
 )
 

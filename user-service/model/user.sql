@@ -6,7 +6,9 @@ CREATE TABLE users (
                        phone VARCHAR(20),
                        address TEXT,
                        points INT DEFAULT 0,
-                       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    updated_at TIMESTAMP ,
+                    deleted_at TIMESTAMP
 );
 
 -- user_service_db.addresses
@@ -19,5 +21,6 @@ CREATE TABLE addresses (
                            is_default BOOLEAN DEFAULT FALSE,
                            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                           deleted_at TIMESTAMP,
                            FOREIGN KEY (user_id) REFERENCES users(id)
 );

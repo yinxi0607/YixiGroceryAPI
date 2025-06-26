@@ -1,16 +1,19 @@
 package main
 
 import (
-	"go-micro.dev/v5/web"
+	"context"
 	"log"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/swaggo/files"
 	"github.com/swaggo/gin-swagger"
 	_ "github.com/yinxi0607/YixiGroceryAPI/api-gateway/docs"
-	"github.com/yinxi0607/YixiGroceryAPI/api-gateway/handler"
 	"github.com/yinxi0607/YixiGroceryAPI/api-gateway/middleware"
+	userProto "github.com/yinxi0607/YixiGroceryAPI/proto/user"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 // @title YixiGroceryAPI
@@ -20,44 +23,39 @@ import (
 // @in header
 // @name Authorization
 func main() {
-	// 创建 Go-Micro Web 服务
-	service := web.NewService(
-		web.Name("go.micro.web.api-gateway.yixi"),
-		web.Address(":8080"),
-	)
-
-	// 初始化 Gin
+	// Create Gin router
 	r := gin.Default()
 	r.Use(middleware.Auth())
 
-	// gRPC 客户端连接
-	conn, err := grpc.Dial("yixi-user-service:8081", grpc.WithInsecure())
+	// Create gRPC-Gateway mux
+	gwMux := runtime.NewServeMux()
+
+	// gRPC connection to user-service
+	conn, err := grpc.NewClient("yinxi-user-service:8081", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("Failed to connect to user-service: %v", err)
 	}
-	defer conn.Close()
+	defer func(conn *grpc.ClientConn) {
+		err = conn.Close()
+		if err != nil {
 
-	// 用户服务路由
-	userHandler := handler.NewUserHandler(conn)
-	r.POST("/api/auth/register", userHandler.Register)
-	r.POST("/api/auth/login", userHandler.Login)
-	r.GET("/api/users/me", userHandler.GetUserInfo)
-	r.POST("/api/users/addresses", userHandler.AddAddress)
-	r.PUT("/api/users/addresses/:id", userHandler.UpdateAddress)
-	r.DELETE("/api/users/addresses/:id", userHandler.DeleteAddress)
-	r.GET("/api/users/addresses", userHandler.GetAddresses)
+		}
+	}(conn)
 
-	// Swagger 文档路由
+	// Register UserService handler
+	if err := userProto.RegisterUserServiceHandler(context.Background(), gwMux, conn); err != nil {
+		log.Fatalf("Failed to register user service handler: %v", err)
+	}
+
+	// Mount gRPC-Gateway to Gin
+	r.Any("/api/*any", gin.WrapH(gwMux))
+
+	// Swagger documentation route
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
-	// 设置 Gin 路由
-	service.Handle("/", r)
-
-	// 启动服务
-	if err := service.Init(); err != nil {
-		log.Fatal(err)
-	}
-	if err := service.Run(); err != nil {
-		log.Fatal(err)
+	// Start server
+	log.Println("Starting API Gateway on :8080")
+	if err := http.ListenAndServe(":8080", r); err != nil {
+		log.Fatalf("Failed to start server: %v", err)
 	}
 }

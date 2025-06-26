@@ -1,8 +1,9 @@
 package middleware
 
 import (
-	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt/v5"
+	"strings"
 )
 
 func Auth() gin.HandlerFunc {
@@ -19,6 +20,10 @@ func Auth() gin.HandlerFunc {
 			return
 		}
 
+		if len(tokenStr) > 7 && strings.HasPrefix(tokenStr, "Bearer ") {
+			tokenStr = tokenStr[7:]
+		}
+
 		token, err := jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
 			return []byte("your_jwt_secret"), nil
 		})
@@ -28,8 +33,19 @@ func Auth() gin.HandlerFunc {
 			return
 		}
 
-		claims, _ := token.Claims.(jwt.MapClaims)
-		c.Set("user_id", uint(claims["user_id"].(float64)))
+		claims, ok := token.Claims.(jwt.MapClaims)
+		if !ok {
+			c.JSON(401, gin.H{"code": 401, "message": "Invalid claims"})
+			c.Abort()
+			return
+		}
+		userID, ok := claims["user_id"].(float64)
+		if !ok {
+			c.JSON(401, gin.H{"code": 401, "message": "Invalid user_id"})
+			c.Abort()
+			return
+		}
+		c.Set("user_id", uint(userID))
 		c.Next()
 	}
 }

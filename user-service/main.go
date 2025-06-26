@@ -2,29 +2,32 @@ package main
 
 import (
 	"log"
+	"net"
 
 	userProto "github.com/yinxi0607/YixiGroceryAPI/proto/user"
 	"github.com/yinxi0607/YixiGroceryAPI/user-service/config"
 	"github.com/yinxi0607/YixiGroceryAPI/user-service/handler"
-	"go-micro.dev/v5"
+	"google.golang.org/grpc"
 )
 
 func main() {
-	// 创建 Go-Micro 服务
-	service := micro.NewService(
-		micro.Name("go.micro.srv.user.yixi"),
-		micro.Address(":8081"),
-	)
-
-	// 初始化
+	// Initialize database
 	config.InitDB()
-	userProto.RegisterUserServiceHandler(service.Server(), &handler.UserHandler{})
 
-	// 启动服务
-	if err := service.Init(); err != nil {
-		log.Fatal(err)
+	// Create gRPC server
+	srv := grpc.NewServer()
+
+	// Register UserService
+	userProto.RegisterUserServiceServer(srv, &handler.UserHandler{})
+
+	// Start gRPC server
+	lis, err := net.Listen("tcp", ":8081")
+	if err != nil {
+		log.Fatalf("Failed to listen: %v", err)
 	}
-	if err := service.Run(); err != nil {
-		log.Fatal(err)
+
+	log.Println("Starting gRPC server on :8081")
+	if err := srv.Serve(lis); err != nil {
+		log.Fatalf("Failed to serve: %v", err)
 	}
 }
