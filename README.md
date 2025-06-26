@@ -1,2 +1,0 @@
-# YixiGroceryAPI
-YixiGroceryAPI
