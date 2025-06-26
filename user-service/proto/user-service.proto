@@ -1,30 +1,112 @@
 syntax = "proto3";
 
-package userservice;
+package user_service;
 
-option go_package = "./proto;userservice";
+option go_package = "./proto";
 
+// 用户服务定义
 service UserService {
-	rpc Call(Request) returns (Response) {}
-	rpc Stream(StreamingRequest) returns (stream StreamingResponse) {}
+	// 注册用户
+	rpc Register(RegisterRequest) returns (RegisterResponse);
+	// 登录用户
+	rpc Login(LoginRequest) returns (LoginResponse);
+	// 获取用户信息
+	rpc GetUser(GetUserRequest) returns (GetUserResponse);
+	// 更新用户信息
+	rpc UpdateUser(UpdateUserRequest) returns (UpdateUserResponse);
+	// 删除用户
+	rpc DeleteUser(DeleteUserRequest) returns (DeleteUserResponse);
+	// 列出所有用户
+	rpc ListUsers(ListUsersRequest) returns (ListUsersResponse);
 }
 
-message Message {
-	string say = 1;
+// 注册请求
+message RegisterRequest {
+	string username = 1;
+	string password = 2;
+	string email = 3;
+	string address = 4; // 新增地址字段
 }
 
-message Request {
-	string name = 1;
+// 注册响应
+message RegisterResponse {
+	string user_id = 1;
+	string message = 2;
+	bool success = 3;
 }
 
-message Response {
-	string msg = 1;
+// 登录请求
+message LoginRequest {
+	string username = 1;
+	string password = 2;
 }
 
-message StreamingRequest {
-	int64 count = 1;
+// 登录响应
+message LoginResponse {
+	string user_id = 1;
+	string token = 2; // 假设返回 JWT 令牌
+	string message = 3;
+	bool success = 4;
 }
 
-message StreamingResponse {
-	int64 count = 1;
+// 获取用户请求
+message GetUserRequest {
+	string user_id = 1;
+}
+
+// 获取用户响应
+message GetUserResponse {
+	string user_id = 1;
+	string username = 2;
+	string email = 3;
+	string address = 4; // 新增地址字段
+	string message = 5;
+	bool success = 6;
+}
+
+// 更新用户请求
+message UpdateUserRequest {
+	string user_id = 1;
+	string username = 2;
+	string email = 3;
+	string password = 4; // 可选，用于更新密码
+	string address = 5; // 新增地址字段
+}
+
+// 更新用户响应
+message UpdateUserResponse {
+	string message = 1;
+	bool success = 2;
+}
+
+// 删除用户请求
+message DeleteUserRequest {
+	string user_id = 1;
+}
+
+// 删除用户响应
+message DeleteUserResponse {
+	string message = 1;
+	bool success = 2;
+}
+
+// 列出用户请求
+message ListUsersRequest {
+	int32 page = 1;
+	int32 page_size = 2;
+}
+
+// 列出用户响应
+message ListUsersResponse {
+	repeated User users = 1;
+	string message = 2;
+	bool success = 3;
+}
+
+// 用户信息
+message User {
+	string user_id = 1;
+	string username = 2;
+	string email = 3;
+	string address = 4; // 新增地址字段
 }
