@@ -32,6 +32,8 @@ type UserService interface {
 	Register(ctx context.Context, in *RegisterRequest, opts ...client.CallOption) (*RegisterResponse, error)
 	// 登录用户
 	Login(ctx context.Context, in *LoginRequest, opts ...client.CallOption) (*LoginResponse, error)
+	// 刷新令牌
+	RefreshToken(ctx context.Context, in *RefreshTokenRequest, opts ...client.CallOption) (*RefreshTokenResponse, error)
 	// 获取用户信息
 	GetUser(ctx context.Context, in *GetUserRequest, opts ...client.CallOption) (*GetUserResponse, error)
 	// 更新用户信息
@@ -67,6 +69,16 @@ func (c *userService) Register(ctx context.Context, in *RegisterRequest, opts ..
 func (c *userService) Login(ctx context.Context, in *LoginRequest, opts ...client.CallOption) (*LoginResponse, error) {
 	req := c.c.NewRequest(c.name, "UserService.Login", in)
 	out := new(LoginResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userService) RefreshToken(ctx context.Context, in *RefreshTokenRequest, opts ...client.CallOption) (*RefreshTokenResponse, error) {
+	req := c.c.NewRequest(c.name, "UserService.RefreshToken", in)
+	out := new(RefreshTokenResponse)
 	err := c.c.Call(ctx, req, out, opts...)
 	if err != nil {
 		return nil, err
@@ -121,6 +133,8 @@ type UserServiceHandler interface {
 	Register(context.Context, *RegisterRequest, *RegisterResponse) error
 	// 登录用户
 	Login(context.Context, *LoginRequest, *LoginResponse) error
+	// 刷新令牌
+	RefreshToken(context.Context, *RefreshTokenRequest, *RefreshTokenResponse) error
 	// 获取用户信息
 	GetUser(context.Context, *GetUserRequest, *GetUserResponse) error
 	// 更新用户信息
@@ -135,6 +149,7 @@ func RegisterUserServiceHandler(s server.Server, hdlr UserServiceHandler, opts .
 	type userService interface {
 		Register(ctx context.Context, in *RegisterRequest, out *RegisterResponse) error
 		Login(ctx context.Context, in *LoginRequest, out *LoginResponse) error
+		RefreshToken(ctx context.Context, in *RefreshTokenRequest, out *RefreshTokenResponse) error
 		GetUser(ctx context.Context, in *GetUserRequest, out *GetUserResponse) error
 		UpdateUser(ctx context.Context, in *UpdateUserRequest, out *UpdateUserResponse) error
 		DeleteUser(ctx context.Context, in *DeleteUserRequest, out *DeleteUserResponse) error
@@ -157,6 +172,10 @@ func (h *userServiceHandler) Register(ctx context.Context, in *RegisterRequest, 
 
 func (h *userServiceHandler) Login(ctx context.Context, in *LoginRequest, out *LoginResponse) error {
 	return h.UserServiceHandler.Login(ctx, in, out)
+}
+
+func (h *userServiceHandler) RefreshToken(ctx context.Context, in *RefreshTokenRequest, out *RefreshTokenResponse) error {
+	return h.UserServiceHandler.RefreshToken(ctx, in, out)
 }
 
 func (h *userServiceHandler) GetUser(ctx context.Context, in *GetUserRequest, out *GetUserResponse) error {
